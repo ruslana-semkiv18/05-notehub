@@ -12,10 +12,6 @@ export interface CreateNoteRequest {
   tag: NoteTag;
 }
 
-export interface DeleteNoteResponse {
-  id: string;
-}
-
 const API_KEY = import.meta.env.VITE_NOTEHUB_TOKEN;
 axios.defaults.baseURL = "https://notehub-public.goit.study/api";
 axios.defaults.headers.common["Authorization"] = `Bearer ${API_KEY}`;
@@ -40,8 +36,8 @@ export const createNote = async (
   return response.data;
 };
 
-export const deleteNote = async (id: string): Promise<DeleteNoteResponse> => {
-  const response = await axios.delete<DeleteNoteResponse>(`/notes/${id}`);
+export const deleteNote = async (id: string): Promise<Note> => {
+  const response = await axios.delete<Note>(`/notes/${id}`);
 
   return response.data;
 };

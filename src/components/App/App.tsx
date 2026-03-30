@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useDebouncedCallback } from "use-debounce";
 import { fetchNotes } from "../../services/noteService";
-//import type { Note } from "../../types/note";
-import Pagination from "../Pagination/Pagination";
-import NoteList from "../NoteList/NoteList";
+import toast, { Toaster } from "react-hot-toast";
 import SearchBox from "../SearchBox/SearchBox";
-import css from "./App.module.css";
+import Pagination from "../Pagination/Pagination";
 import Modal from "../Modal/Modal";
+import NoteList from "../NoteList/NoteList";
+import Loader from "../Loader/Loader";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import css from "./App.module.css";
 
 export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -17,7 +20,7 @@ export default function App() {
   const closeModal = () => setIsModalOpen(false);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["note", searchQuery, currentPage],
+    queryKey: ["notes", searchQuery, currentPage],
     queryFn: () => fetchNotes(searchQuery, currentPage),
     placeholderData: keepPreviousData,
   });
@@ -25,18 +28,20 @@ export default function App() {
   const notes = data?.notes || [];
   const totalPages = data?.totalPages || 0;
 
-  const handleSearch = (query: string) => {
+  const handleSearch = useDebouncedCallback((query: string) => {
     setSearchQuery(query);
     setCurrentPage(1);
-  };
+  }, 1000);
 
   const handlePageChange = (nextPage: number) => {
     setCurrentPage(nextPage);
   };
 
-  // const handleCreateNote=()=> {
-
-  // }
+  useEffect(() => {
+    if (data && data.notes.length === 0) {
+      toast.error("No notes found for your request.");
+    }
+  }, [data]);
 
   return (
     <div className={css.app}>
@@ -54,9 +59,13 @@ export default function App() {
         </button>
       </header>
       <main>
-        {isLoading && <p className={css.status}>Loading notes...</p>}
-        {isError && <p className={css.error}>"Something went wrong"</p>}
-        {!isLoading && notes.length > 0 && <NoteList notes={notes} />}
+        <Toaster />
+        {isLoading && <Loader />}
+        {isError && <ErrorMessage />}
+
+        {!isLoading && !isError && notes.length > 0 && (
+          <NoteList notes={notes} />
+        )}
         {isModalOpen && <Modal onClose={closeModal} />}
       </main>
     </div>

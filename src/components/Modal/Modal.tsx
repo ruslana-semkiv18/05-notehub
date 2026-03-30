@@ -1,19 +1,13 @@
 import { createPortal } from "react-dom";
+import { useEffect } from "react";
 import NoteForm from "../NoteForm/NoteForm";
 import css from "./Modal.module.css";
-import { useEffect } from "react";
 
 interface ModalProps {
   onClose: () => void;
 }
 
 export default function Modal({ onClose }: ModalProps) {
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -29,6 +23,12 @@ export default function Modal({ onClose }: ModalProps) {
       document.body.style.overflow = "";
     };
   }, [onClose]);
+
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
 
   return createPortal(
     <div

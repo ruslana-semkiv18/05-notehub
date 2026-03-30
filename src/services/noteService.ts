@@ -4,8 +4,6 @@ import type { Note, NoteTag } from "../types/note.ts";
 export interface NotesResponse {
   notes: Note[];
   totalPages: number;
-  page: number;
-  perPage: number;
 }
 
 export interface CreateNoteRequest {

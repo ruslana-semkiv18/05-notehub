@@ -6,6 +6,7 @@ import toast, { Toaster } from "react-hot-toast";
 import SearchBox from "../SearchBox/SearchBox";
 import Pagination from "../Pagination/Pagination";
 import Modal from "../Modal/Modal";
+import NoteForm from "../NoteForm/NoteForm";
 import NoteList from "../NoteList/NoteList";
 import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
@@ -38,7 +39,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (data && data.notes.length === 0) {
+    if (data && data.notes.length === 0 && searchQuery !== "") {
       toast.error("No notes found for your request.");
     }
   }, [data]);
@@ -66,7 +67,11 @@ export default function App() {
         {!isLoading && !isError && notes.length > 0 && (
           <NoteList notes={notes} />
         )}
-        {isModalOpen && <Modal onClose={closeModal} />}
+        {isModalOpen && (
+          <Modal onClose={closeModal}>
+            <NoteForm onClose={closeModal} />
+          </Modal>
+        )}
       </main>
     </div>
   );
